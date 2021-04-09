@@ -15,8 +15,8 @@
             </p>
         </div>
         <div>
-            <p>작성자 :
-            <input type="text" name="userid" placeholder="작성자 입력" required="required">
+            <p>작성자 : ${userid }
+            <input type="hidden" name="userid" value="${userid}" placeholder="작성자 입력" >
             </p>
         </div>
         <div>

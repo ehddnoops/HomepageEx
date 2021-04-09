@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import edu.web.board.domain.BoardVO;
 import edu.web.board.persistence.BoardDAO;
@@ -139,9 +140,25 @@ public class BoardController extends HttpServlet {
 	}
 	//register.jsp를 호출
 	private void registerGET(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String path = BOARD_URL + REGISTER + EXTENSION;
-		RequestDispatcher dispatcher = request.getRequestDispatcher(path);
-		dispatcher.forward(request, response);
+		//로그인 세션 체크
+		HttpSession session = request.getSession();
+		String userid = (String) session.getAttribute("userid");
+		
+		//userid 세션 존재(로그인 되어 있음)
+		if(userid != null && !userid.equals("")) {
+			//register.jsp로 이동
+			String path = BOARD_URL + REGISTER + EXTENSION;
+			RequestDispatcher dispatcher = request.getRequestDispatcher(path);
+			dispatcher.forward(request, response);
+			
+		} else { //로그인이 되어 있지 않은 경우
+			//login.go로 이동
+			//session에 목표 url 정보를 저장
+			session.setAttribute("targetURL", REGISTER + ".do");
+			response.sendRedirect("login.go");
+		}
+		
+
 		
 	}
 	//게시판 새 글 데이터 DB 등록 후, index.jsp 페이지 이동
@@ -193,8 +210,6 @@ public class BoardController extends HttpServlet {
 			out.print("<head>" + "<meta charset='UTF-8'>" + "</head>");
 			out.print("<script>location.href='" + MAIN + EXTENSION + "'</script>");
 		}
-
-
 	}
 	
 	

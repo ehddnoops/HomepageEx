@@ -30,7 +30,19 @@ public class LoginController extends HttpServlet {
 		session.setAttribute("userid", userid);
 		session.setMaxInactiveInterval(600);
 		
-		response.sendRedirect("index.jsp");
+		//설정된 url 가져오기
+		String url = (String) session.getAttribute("targetURL");
+		System.out.println("targetURL : " + url);
+		
+		if(url != null && !url.equals("")) {
+			// 글 작성 버튼을 누르고 로그인을 한 경우
+			response.sendRedirect(url);
+			session.removeAttribute("targetURL");
+		} else { //targetURL이 존재하지 않는 경우
+			// 로그인만 수행한 경우
+			response.sendRedirect("index.jsp");
+		}
+		
 	} else {
 		response.sendRedirect("login.go");
 		
