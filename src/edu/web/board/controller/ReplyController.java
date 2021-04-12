@@ -74,7 +74,7 @@ public class ReplyController extends HttpServlet {
 			
 	}
 	private void replyList(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		int replyBno = 28;
+		int replyBno = Integer.parseInt(request.getParameter("replyBno"));
 		List<ReplyVO> list = dao.select(replyBno);
 		
 		JSONArray jsonArray = new JSONArray();
@@ -91,11 +91,25 @@ public class ReplyController extends HttpServlet {
 		response.getWriter().append(jsonArray.toString());
 		
 	}
-	private void replyUpdate(HttpServletRequest request, HttpServletResponse response) {
+	private void replyUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	int replyNo = Integer.parseInt(request.getParameter("replyNo"));
+	int replyBno = Integer.parseInt(request.getParameter("replyBno"));
+	String replyContent = request.getParameter("replyContent");
+	ReplyVO vo = new ReplyVO(replyNo, replyBno, replyContent, "", "");
 	
+	int result = dao.update(vo);
+	if(result == 1) {
+		response.getWriter().append("success");
+		
 	}
-	private void replyDelete(HttpServletRequest request, HttpServletResponse response) {
-	
+	}
+	private void replyDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	int replyNo = Integer.parseInt(request.getParameter("replyNo"));
+	int replyBno = Integer.parseInt(request.getParameter("replyBno"));
+	int result = dao.delete(replyNo, replyBno);
+	if(result == 1) {
+		response.getWriter().append("success");
+	}
 	}
 }
 

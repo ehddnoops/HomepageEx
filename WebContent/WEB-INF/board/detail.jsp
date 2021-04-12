@@ -35,7 +35,7 @@
     
     <c:if test="${empty userid }">
         * 댓글은 로그인이 필요한 서비스입니다.
-        <a href="login.go"></a>
+        <a href="login.go">로그인</a>
     </c:if>
     <c:if test="${not empty userid }">
         ${userid }님, 이제 댓글을 작성할 수 있어요 !
@@ -50,11 +50,18 @@
         </c:if>
         </div>
     </div>
+    <div style="text-align: center;">
+        <div id="replies"></div>
+    </div>
+    
+    
+    
     <script type="text/javascript">
     	$(document).ready(function(){
     		
     		var replyBno = $('#replyBno').val();// 게시판 번호 값
     		// id= replyBno의 value 값을 가져옴
+    		getAllReplies();
     		$('#btn_add').click(function(){
     			var replyContent = $('#replyContent').val();
     			var replyId = $('#replyId').val();
@@ -72,7 +79,12 @@
     				success : function(result){
     					if(result == 'success'){
     						alert('댓글 입력 성공');
+    						getAllReplies();
     						$('#replyContent').val('');
+    						//// 댓글 입력이 완료되면 replyContent value 초기화
+
+    					} else {
+    						alert('실패');
     					}
     					
     				}
@@ -84,6 +96,97 @@
     			//data : 게시판 번호(replyBno), 댓글 내용(replyContent), 댓글 아이디(replyId)
     		}); // end btn_add.click()
     			
+    		// 게시판의 댓글 전체 가져오기
+    		function getAllReplies(){
+    			var url = 'replies/all?replyBno=' + replyBno;
+    			$.getJSON(
+    				url,
+    				function(jsonData){
+    					//jsonData : list 데이터가 저장되어 있음
+    					console.log(jsonData);
+    					var writer = $('#replyId').val();
+    					var list = ''; //JSON 데이터를 표현할 변수
+    					// $(컬렉션).each() : 컬렉션 데이터를 반복문으로 꺼내는 함수
+    					$(jsonData).each(function(){
+    						// this : 컬렉션에서 각 데이터를 꺼내서 저장 (한줄을 의미)
+    						console.log(this);
+    						var replyDate = new Date(this.replyDate);
+    						var disabled = 'disabled';
+    						var readonly = 'readonly';
+    						if(writer == this.replyId){
+    							disabled = '';
+    							readonly = '';
+    						}
+    						list += '<div class="reply_item">'
+    							+ '<pre>'
+    							+ '<input type="hidden" id="replyNo" value="' + this.replyNo + '" />'
+    							+ '<input type="hidden" id="replyId" value="' + this.replyId + '" />'
+    							+ this.replyId
+    							+ '&nbsp;&nbsp;' //공백
+    							+ '<input type="text" id="replyContent" value="' + this.replyContent + '" '+ readonly +'/>'
+    							+ '&nbsp;&nbsp;'
+    							+ replyDate
+    							+ '&nbsp;&nbsp;'
+    							+ '<button class="btn_update" type="button" '+disabled +' >수정</button>'
+    							+ '<button class="btn_delete" type="button" '+disabled +' >삭제</button>'
+    							+ "</pre>"
+    							+ "</div>";
+    					}); // end each()
+    					$('#replies').html(list);
+    				}// end function()
+    			); // end getJSON()
+    			
+    			
+    		}//end getAllReplies()
+    		
+    		//수정 버튼을 클릭하면 선택된 댓글 수정
+    		$('#replies').on('click', '.reply_item .btn_update', function(){
+    			console.log(this);
+    			
+    			//선택된 댓글 replyNo, replyContent 값을 저장
+    			// prevAll() : 선택된 노드의 이전 모든 형제 노드
+    			var replyNo = $(this).prevAll('#replyNo').val();
+    			var replyContent = $(this).prevAll('#replyContent').val();
+    			console.log($(this).prevAll());
+    			console.log("선택된 댓글 번호 : " + replyNo + ", 댓글 내용 : " + replyContent);
+    			
+    			// ajax 요청
+    			$.ajax({
+    				type : 'get',
+    				url : 'replies/update?replyNo=' + replyNo,
+    				data : {
+    					'replyBno' : replyBno,
+    					'replyContent' : replyContent
+    				},
+    				success : function(result){
+    					if(result == 'success'){
+    						alert('댓글 수정 성공');
+    						getAllReplies();
+    					}
+    				}// end success
+    			}); // end ajax()
+    			
+    		}); // end replies.on()
+    		
+    		//삭제 버튼을 클릭하면 선택된 댓글 삭제
+    		$('#replies').on('click', '.reply_item .btn_delete', function(){
+    			var replyNo = $(this).prevAll('#replyNo').val();
+    			console.log("선택된 댓글 번호 : " + replyNo);
+    		$.ajax({
+    			type : 'get',
+    			url : 'replies/delete?replyNo=' + replyNo,
+    			data : {
+    				'replyBno' : replyBno
+    			},
+    			success : function(result){
+    				if(result == 'success'){
+    					alert('삭제 성공');
+    					getAllReplies();
+    				}
+    			}
+    		});
+    		});
+    		
     	}); // end document
     </script>    
 </body>

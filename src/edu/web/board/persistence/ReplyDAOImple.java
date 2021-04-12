@@ -88,7 +88,6 @@ public class ReplyDAOImple implements ReplyDAO, ReplyQuery{
 		int result = 0;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		try {
 			conn = ConnMgr.getConnection();
 			pstmt = conn.prepareStatement(SQL_UPDATE);
@@ -100,7 +99,7 @@ public class ReplyDAOImple implements ReplyDAO, ReplyQuery{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			ConnMgr.close(conn, pstmt, rs);
+			ConnMgr.close(conn, pstmt);
 		}
 		return result;
 	}
@@ -110,7 +109,6 @@ public class ReplyDAOImple implements ReplyDAO, ReplyQuery{
 		int result = 0;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		try {
 			conn = ConnMgr.getConnection();
 			pstmt = conn.prepareStatement(SQL_DELETE);
@@ -121,7 +119,7 @@ public class ReplyDAOImple implements ReplyDAO, ReplyQuery{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			ConnMgr.close(conn, pstmt, rs);
+			ConnMgr.close(conn, pstmt);
 		}
 		return result;
 	}
